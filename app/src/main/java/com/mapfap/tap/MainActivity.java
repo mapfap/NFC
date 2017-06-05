@@ -1,19 +1,8 @@
 package com.mapfap.tap;
 
 
-import java.nio.charset.Charset;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Locale;
-
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.PendingIntent;
-import android.content.ClipData;
-import android.content.ClipboardManager;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.nfc.NdefMessage;
@@ -29,15 +18,20 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.provider.Settings;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.mapfap.tap.record.ParsedNdefRecord;
+
+import java.nio.charset.Charset;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Locale;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -49,8 +43,6 @@ public class MainActivity extends AppCompatActivity {
     private NdefMessage mNdefPushMessage;
 
     private AlertDialog mDialog;
-
-    private List<Tag> mTags = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -133,11 +125,11 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         builder.create().show();
-        return;
     }
 
     private void resolveIntent(Intent intent) {
         String action = intent.getAction();
+        Log.d("MainActivity", action);
         if (NfcAdapter.ACTION_TAG_DISCOVERED.equals(action)
                 || NfcAdapter.ACTION_TECH_DISCOVERED.equals(action)
                 || NfcAdapter.ACTION_NDEF_DISCOVERED.equals(action)) {
@@ -157,7 +149,6 @@ public class MainActivity extends AppCompatActivity {
                 NdefRecord record = new NdefRecord(NdefRecord.TNF_UNKNOWN, empty, id, payload);
                 NdefMessage msg = new NdefMessage(new NdefRecord[] { record });
                 msgs = new NdefMessage[] { msg };
-                mTags.add(tag);
             }
             // Setup the views
             buildTagViews(msgs);
@@ -167,18 +158,16 @@ public class MainActivity extends AppCompatActivity {
     private String dumpTagData(Tag tag) {
         StringBuilder sb = new StringBuilder();
         byte[] id = tag.getId();
-        sb.append("ID (hex): ").append(toHex(id)).append('\n');
-        sb.append("ID (reversed hex): ").append(toReversedHex(id)).append('\n');
-        sb.append("ID (dec): ").append(toDec(id)).append('\n');
-        sb.append("ID (reversed dec): ").append(toReversedDec(id)).append('\n');
+        sb.append("ID (Hex): ").append(toHex(id)).append('\n');
 
         String prefix = "android.nfc.tech.";
         sb.append("Technologies: ");
         for (String tech : tag.getTechList()) {
-            sb.append(tech.substring(prefix.length()));
+                sb.append(tech.substring(prefix.length()));
             sb.append(", ");
         }
         sb.delete(sb.length() - 2, sb.length());
+
         for (String tech : tag.getTechList()) {
             if (tech.equals(MifareClassic.class.getName())) {
                 sb.append('\n');
@@ -338,46 +327,10 @@ public class MainActivity extends AppCompatActivity {
                 sb.append('0');
             sb.append(Integer.toHexString(b));
             if (i > 0) {
-                sb.append(" ");
+                sb.append("");
             }
         }
         return sb.toString();
-    }
-
-    private String toReversedHex(byte[] bytes) {
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < bytes.length; ++i) {
-            if (i > 0) {
-                sb.append(" ");
-            }
-            int b = bytes[i] & 0xff;
-            if (b < 0x10)
-                sb.append('0');
-            sb.append(Integer.toHexString(b));
-        }
-        return sb.toString();
-    }
-
-    private long toDec(byte[] bytes) {
-        long result = 0;
-        long factor = 1;
-        for (int i = 0; i < bytes.length; ++i) {
-            long value = bytes[i] & 0xffl;
-            result += value * factor;
-            factor *= 256l;
-        }
-        return result;
-    }
-
-    private long toReversedDec(byte[] bytes) {
-        long result = 0;
-        long factor = 1;
-        for (int i = bytes.length - 1; i >= 0; --i) {
-            long value = bytes[i] & 0xffl;
-            result += value * factor;
-            factor *= 256l;
-        }
-        return result;
     }
 
     void buildTagViews(NdefMessage[] msgs) {
@@ -400,98 +353,6 @@ public class MainActivity extends AppCompatActivity {
             content.addView(record.getView(this, inflater, content, i), 1 + i);
             content.addView(inflater.inflate(R.layout.tag_divider, content, false), 2 + i);
         }
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
-    }
-
-//    @Override
-//    public boolean onOptionsItemSelected(MenuItem item) {
-//
-//        if (mTags.size() == 0) {
-//            Toast.makeText(this, R.string.nothing_scanned, Toast.LENGTH_LONG).show();
-//            return true;
-//        }
-//
-//        switch (item.getItemId()) {
-//            case R.id.menu_main_clear:
-//                clearTags();
-//                return true;
-//            case R.id.menu_copy_hex:
-//                copyIds(getIdsHex());
-//                return true;
-//            case R.id.menu_copy_reversed_hex:
-//                copyIds(getIdsReversedHex());
-//                return true;
-//            case R.id.menu_copy_dec:
-//                copyIds(getIdsDec());
-//                return true;
-//            case R.id.menu_copy_reversed_dec:
-//                copyIds(getIdsReversedDec());
-//                return true;
-//            default:
-//                return super.onOptionsItemSelected(item);
-//        }
-//    }
-
-    private void clearTags() {
-        mTags.clear();
-        for (int i = mTagContent.getChildCount() -1; i >= 0 ; i--) {
-            View view = mTagContent.getChildAt(i);
-            if (view.getId() != R.id.tag_viewer_text) {
-                mTagContent.removeViewAt(i);
-            }
-        }
-    }
-
-    private void copyIds(String text) {
-        ClipboardManager clipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
-        ClipData clipData = ClipData.newPlainText("NFC IDs", text);
-        clipboard.setPrimaryClip(clipData);
-        Toast.makeText(this, mTags.size() + " IDs copied", Toast.LENGTH_SHORT).show();
-    }
-
-    private String getIdsHex() {
-        StringBuilder builder = new StringBuilder();
-        for (Tag tag : mTags) {
-            builder.append(toHex(tag.getId()));
-            builder.append('\n');
-        }
-        builder.setLength(builder.length() - 1); // Remove last new line
-        return builder.toString().replace(" ", "");
-    }
-
-    private String getIdsReversedHex() {
-        StringBuilder builder = new StringBuilder();
-        for (Tag tag : mTags) {
-            builder.append(toReversedHex(tag.getId()));
-            builder.append('\n');
-        }
-        builder.setLength(builder.length() - 1); // Remove last new line
-        return builder.toString().replace(" ", "");
-    }
-
-    private String getIdsDec() {
-        StringBuilder builder = new StringBuilder();
-        for (Tag tag : mTags) {
-            builder.append(toDec(tag.getId()));
-            builder.append('\n');
-        }
-        builder.setLength(builder.length() - 1); // Remove last new line
-        return builder.toString();
-    }
-
-    private String getIdsReversedDec() {
-        StringBuilder builder = new StringBuilder();
-        for (Tag tag : mTags) {
-            builder.append(toReversedDec(tag.getId()));
-            builder.append('\n');
-        }
-        builder.setLength(builder.length() - 1); // Remove last new line
-        return builder.toString();
     }
 
     @Override
