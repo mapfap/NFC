@@ -18,13 +18,27 @@ class APICaller {
         response.employeeName = "Sarun W.";
         response.employeeDepartment = "IT";
         response.employeeIsPreRegistered = true;
+        response.timestamp = "30/12/2017 08:32:26";
         return response;
     }
 
-    public APIResponse findEmployee(String nfcId) {
+    public APIResponse sendManualTap(String employeeId) {
         APIResponse response = new APIResponse();
         response.isError = false;
+
         response.isEmployeeFound = true;
+        response.employeeId = "1234";
+        response.employeeName = "Sarun W.";
+        response.employeeDepartment = "IT";
+        response.employeeIsPreRegistered = true;
+        response.timestamp = "30/12/2017 08:32:26";
+        return response;
+    }
+
+    public APIResponse findEmployeeByEmployeeId(String employeeId) {
+        APIResponse response = new APIResponse();
+        response.isError = false;
+        response.isEmployeeFound = false;
         response.employeeId = "1234";
         response.employeeName = "Sarun W.";
         response.employeeDepartment = "IT";

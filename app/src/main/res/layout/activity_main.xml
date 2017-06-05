@@ -31,6 +31,11 @@
         </LinearLayout>
 
 
+        <Button
+            android:id="@+id/manual_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Manual" />
 
         <TextView
             android:id="@+id/main_text"
@@ -39,5 +44,6 @@
             android:padding="6dp"
             android:textAppearance="?android:attr/textAppearanceLarge"
             android:text="" />
+
     </LinearLayout>
 </ScrollView>

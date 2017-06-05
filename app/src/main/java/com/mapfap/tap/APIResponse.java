@@ -20,6 +20,8 @@ class APIResponse {
 
     public boolean isEmployeeFound;
 
+    public String timestamp;
+
     public APIResponse() {
 
     }

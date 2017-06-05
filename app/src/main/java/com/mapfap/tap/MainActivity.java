@@ -35,37 +35,122 @@ public class MainActivity extends AppCompatActivity {
 
         resolveIntent(getIntent());
 
-        mDialog = new AlertDialog.Builder(this).setNeutralButton("Ok", null).create();
-
-        mAdapter = NfcAdapter.getDefaultAdapter(this);
-        if (mAdapter == null) {
-            showMessage(R.string.error, R.string.no_nfc);
-            finish();
-            return;
-        }
-
         mPendingIntent = PendingIntent.getActivity(this, 0, new Intent(this, getClass()).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP), 0);
 
         eventName = (TextView) findViewById(R.id.event_name);
         mainText = (TextView) findViewById(R.id.main_text);
         Button refreshButton = (Button) findViewById(R.id.refresh_button);
+        Button manualButton = (Button) findViewById(R.id.manual_button);
+
+        apiCaller = new APICaller();
+
         refreshButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 getActiveEvent();
             }
         });
+        manualButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                respondManualTap();
+            }
+        });
 
-        apiCaller = new APICaller();
+        mAdapter = NfcAdapter.getDefaultAdapter(this);
+        if (mAdapter == null) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setMessage(R.string.no_nfc);
+            builder.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialogInterface, int i) {
+
+                }
+            });
+            builder.create().show();
+        }
 
         getActiveEvent();
-
     }
 
-    private void showMessage(int title, int message) {
-        mDialog.setTitle(title);
-        mDialog.setMessage(getText(message));
-        mDialog.show();
+    private void respondManualTap() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage(R.string.enter_employee);
+
+        final EditText et = new EditText(this);
+
+        et.setInputType(InputType.TYPE_CLASS_NUMBER);
+        et.requestFocus();
+        builder.setView(et);
+
+        builder.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener()
+        {
+            @Override
+            public void onClick(DialogInterface dialog, int which)
+            {
+                String employeeId = et.getText().toString();
+                APIResponse response = apiCaller.findEmployeeByEmployeeId(employeeId);
+                if (response.isError) {
+                    respondError(response);
+                } else if (response.isEmployeeFound) {
+                    respondManualEmployeeFound(response);
+                } else {
+                    respondManualEmployeeNotFound(employeeId);
+                }
+            }
+        });
+
+        builder.create().show();
+    }
+
+    private void respondManualEmployeeFound(APIResponse respond) {
+        StringBuilder sb = new StringBuilder();
+        sb.append(respond.employeeId);
+        sb.append(" ");
+        sb.append(respond.employeeName);
+        sb.append(" ");
+        sb.append(respond.employeeDepartment);
+        sb.append(" ");
+
+        final String employeeId = respond.employeeId;
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage("Confirm Tap");
+        builder.setMessage("Employee Matched: " + sb.toString());
+
+        builder.setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialogInterface, int i) {
+                APIResponse response = apiCaller.sendManualTap(employeeId);
+                if (response.isError) {
+                    respondError(response);
+                } else if (response.isEmployeeFound) {
+                    respondTapSuccess(response);
+                }
+            }
+        });
+        builder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialogInterface, int i) {
+
+            }
+        });
+        builder.create().show();
+    }
+
+    private void respondManualEmployeeNotFound(String employeeId) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage(getResources().getString(R.string.no_employee_found) + employeeId) ;
+        builder.setPositiveButton("Retry", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialogInterface, int i) {
+                respondManualTap();
+            }
+        });
+
+        builder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialogInterface, int i) {
+
+            }
+        });
+
+        builder.create().show();
     }
 
     @Override
@@ -144,6 +229,8 @@ public class MainActivity extends AppCompatActivity {
         sb.append(" ");
         sb.append(response.employeeIsPreRegistered);
         sb.append(" ");
+        sb.append(response.timestamp);
+        sb.append(" ");
         mainText.setText(sb);
     }
 
@@ -162,17 +249,37 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(DialogInterface dialog, int which)
             {
-                APIResponse response = apiCaller.findEmployee(et.getText().toString());
+                String employeeId = et.getText().toString();
+                APIResponse response = apiCaller.findEmployeeByEmployeeId(employeeId);
                 if (response.isError) {
                     respondError(response);
                 } else if (response.isEmployeeFound) {
                     respondEmployeeFound(response, nfcId);
                 } else {
-                    respondUnRegisteredNfc(nfcId);
+                    respondEmployeeNotFound(employeeId, nfcId);
                 }
             }
         });
 
+
+        builder.create().show();
+    }
+
+    private void respondEmployeeNotFound(String employeeId, String nfcId) {
+        final String currentNfcId = nfcId;
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage(getResources().getString(R.string.no_employee_found) + employeeId) ;
+        builder.setPositiveButton("Retry", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialogInterface, int i) {
+                respondUnRegisteredNfc(currentNfcId);
+            }
+        });
+
+        builder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialogInterface, int i) {
+
+            }
+        });
 
         builder.create().show();
     }
@@ -195,11 +302,11 @@ public class MainActivity extends AppCompatActivity {
 
         builder.setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialogInterface, int i) {
-                APIResponse registrationResponse = apiCaller.registerEmployeeCard(currentNfcId, employeeId);
-                if (registrationResponse.isError) {
-                    respondError(registrationResponse);
-                } else if (registrationResponse.isNfcRegistered) {
-                    respondTapSuccess(registrationResponse);
+                APIResponse response = apiCaller.registerEmployeeCard(currentNfcId, employeeId);
+                if (response.isError) {
+                    respondError(response);
+                } else if (response.isNfcRegistered) {
+                    respondTapSuccess(response);
                 }
             }
         });
