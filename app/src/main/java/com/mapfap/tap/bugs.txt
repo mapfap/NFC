@@ -1,0 +1,10 @@
+1. upload button impmdieltly without adding file (Upload button is too)
+2. test when NDEF is tapped.
+3. Tap -> send DATETIME RESULT TO API
+
+
+
+
+Develop API
+Start 11:51
+End 02:08

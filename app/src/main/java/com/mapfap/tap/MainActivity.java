@@ -3,6 +3,7 @@ package com.mapfap.tap;
 
 import android.app.AlertDialog;
 import android.app.PendingIntent;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.nfc.NfcAdapter;
@@ -11,6 +12,8 @@ import android.provider.Settings;
 import android.support.v7.app.AppCompatActivity;
 import android.text.InputType;
 import android.view.View;
+import android.view.WindowManager;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -42,7 +45,7 @@ public class MainActivity extends AppCompatActivity {
         Button refreshButton = (Button) findViewById(R.id.refresh_button);
         Button manualButton = (Button) findViewById(R.id.manual_button);
 
-        apiCaller = new APICaller();
+        apiCaller = new APICaller(MainActivity.this);
 
         refreshButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -79,9 +82,10 @@ public class MainActivity extends AppCompatActivity {
         final EditText et = new EditText(this);
 
         et.setInputType(InputType.TYPE_CLASS_NUMBER);
-        et.requestFocus();
-        builder.setView(et);
+        et.setFocusableInTouchMode(true);
 
+
+        builder.setView(et);
         builder.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener()
         {
             @Override
@@ -227,9 +231,13 @@ public class MainActivity extends AppCompatActivity {
         sb.append(" ");
         sb.append(response.employeeDepartment);
         sb.append(" ");
-        sb.append(response.employeeIsPreRegistered);
+
+        if (! response.employeeIsPreRegistered) {
+            sb.append("*NEW*");
+        }
+
         sb.append(" ");
-        sb.append(response.timestamp);
+//        sb.append(response.timestamp);
         sb.append(" ");
         mainText.setText(sb);
     }
@@ -241,6 +249,7 @@ public class MainActivity extends AppCompatActivity {
         final EditText et = new EditText(this);
 
         et.setInputType(InputType.TYPE_CLASS_NUMBER);
+        et.setFocusableInTouchMode(true);
         et.requestFocus();
         builder.setView(et);
 
@@ -319,6 +328,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void respondNoActiveEvent() {
+        eventName.setText("Event: N/A");
+
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setMessage(R.string.no_active_event);
 

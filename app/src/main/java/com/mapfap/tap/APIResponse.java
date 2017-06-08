@@ -6,7 +6,7 @@ package com.mapfap.tap;
 
 class APIResponse {
 
-    public boolean isError;
+    public boolean isError = true;
     public String errorDetails;
 
     public boolean isNfcRegistered;
@@ -20,11 +20,23 @@ class APIResponse {
 
     public boolean isEmployeeFound;
 
-    public String timestamp;
+//    public String timestamp;
 
     public APIResponse() {
 
     }
 
 
+    public void copy(APIResponse o) {
+        this.isError = o.isError;
+        this.errorDetails = o.errorDetails;
+        this.isNfcRegistered = o.isNfcRegistered;
+        this.employeeId = o.employeeId;
+        this.employeeName = o.employeeName;
+        this.employeeDepartment = o.employeeDepartment;
+        this.employeeIsPreRegistered = o.employeeIsPreRegistered;
+        this.activeEvent = o.activeEvent;
+        this.activeEventExists = o.activeEventExists;
+        this.isEmployeeFound = o.isEmployeeFound;
+    }
 }
