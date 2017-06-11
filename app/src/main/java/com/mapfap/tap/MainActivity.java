@@ -1,6 +1,5 @@
 package com.mapfap.tap;
 
-
 import android.app.AlertDialog;
 import android.app.PendingIntent;
 import android.content.Context;
@@ -12,12 +11,14 @@ import android.provider.Settings;
 import android.support.v7.app.AppCompatActivity;
 import android.text.InputType;
 import android.view.View;
-import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.TimeZone;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -30,6 +31,9 @@ public class MainActivity extends AppCompatActivity {
 
     private TextView mainText;
     private TextView eventName;
+
+    private static final SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy - HH:mm:ss");
+    private static final TimeZone timezone = TimeZone.getTimeZone("Asia/Bangkok");
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -80,11 +84,7 @@ public class MainActivity extends AppCompatActivity {
         builder.setMessage(R.string.enter_employee);
 
         final EditText et = new EditText(this);
-
         et.setInputType(InputType.TYPE_CLASS_NUMBER);
-        et.setFocusableInTouchMode(true);
-
-
         builder.setView(et);
         builder.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener()
         {
@@ -104,6 +104,9 @@ public class MainActivity extends AppCompatActivity {
         });
 
         builder.create().show();
+        InputMethodManager inputMethodManager = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+        inputMethodManager.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
+
     }
 
     private void respondManualEmployeeFound(APIResponse respond) {
@@ -174,6 +177,7 @@ public class MainActivity extends AppCompatActivity {
         if (mAdapter != null) {
             mAdapter.disableForegroundDispatch(this);
         }
+        finish();
     }
 
     private void showWirelessSettingsDialog() {
@@ -237,20 +241,17 @@ public class MainActivity extends AppCompatActivity {
         }
 
         sb.append(" ");
-//        sb.append(response.timestamp);
+        sb.append(sdf.format(Calendar.getInstance(timezone).getTime()));
         sb.append(" ");
         mainText.setText(sb);
     }
 
     private void respondUnRegisteredNfc(final String nfcId) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setMessage(R.string.enter_employee);
+        builder.setMessage(R.string.un_registered_nfc);
 
         final EditText et = new EditText(this);
-
         et.setInputType(InputType.TYPE_CLASS_NUMBER);
-        et.setFocusableInTouchMode(true);
-        et.requestFocus();
         builder.setView(et);
 
         builder.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener()
@@ -270,8 +271,9 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-
         builder.create().show();
+        InputMethodManager inputMethodManager = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+        inputMethodManager.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
     }
 
     private void respondEmployeeNotFound(String employeeId, String nfcId) {

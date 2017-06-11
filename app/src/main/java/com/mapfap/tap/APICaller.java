@@ -24,7 +24,7 @@ import java.util.concurrent.TimeoutException;
 
 class APICaller {
 
-    public static final String SERVER = "http://192.168.1.102:3000";
+    public static final String SERVER = "http://192.168.1.103:3000";
     private static final int DEFAULT_TIMEOUT = 8;
     protected Context context;
 
@@ -49,7 +49,7 @@ class APICaller {
 
     // POST /employees/:code/register
     public APIResponse registerEmployeeCard(String nfcId, String employeeId) {
-        return sendRequest("POST", "/employees/" + employeeId + "/register" , "nfc=" + nfcId);
+        return sendRequest("POST", "/employees/register" , "nfc=" + nfcId + "&" + "code=" + employeeId );
     }
 
     // GET /events/active
