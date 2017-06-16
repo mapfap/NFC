@@ -24,7 +24,7 @@ import java.util.concurrent.TimeoutException;
 
 class APICaller {
 
-    public static final String SERVER = "http://bye.mapfap.com";
+    public static final String SERVER = "http://13.228.28.4";
     private static final int DEFAULT_TIMEOUT = 8;
     protected Context context;
 
