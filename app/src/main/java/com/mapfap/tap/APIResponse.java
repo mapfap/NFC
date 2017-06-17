@@ -6,6 +6,7 @@ package com.mapfap.tap;
 
 class APIResponse {
 
+    public UserState userState;
     public boolean isError = true;
     public String errorDetails;
 
@@ -14,6 +15,7 @@ class APIResponse {
     public String employeeName;
     public String employeeDepartment;
     public boolean employeeIsPreRegistered;
+    public boolean isDuplicateTap;
 
     public String activeEvent;
     public boolean activeEventExists;
@@ -38,5 +40,6 @@ class APIResponse {
         this.activeEvent = o.activeEvent;
         this.activeEventExists = o.activeEventExists;
         this.isEmployeeFound = o.isEmployeeFound;
+        this.isDuplicateTap = o.isDuplicateTap;
     }
 }

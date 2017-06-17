@@ -12,6 +12,10 @@ import android.widget.TextView;
 
 import org.w3c.dom.Text;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.TimeZone;
+
 /**
  * Created by mapfap on 6/16/2017 AD.
  */
@@ -21,6 +25,9 @@ public class SuccessActivity extends AppCompatActivity {
     private Intent thisIntent;
     private NfcAdapter mAdapter;
     private PendingIntent mPendingIntent;
+
+    private static final SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy - HH:mm:ss");
+    private static final TimeZone timezone = TimeZone.getTimeZone("Asia/Bangkok");
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,11 +47,13 @@ public class SuccessActivity extends AppCompatActivity {
         TextView idView = (TextView) findViewById(R.id.employee_code);
         TextView nameView = (TextView) findViewById(R.id.employee_name);
         TextView departmentView = (TextView) findViewById(R.id.employee_department);
+        TextView timestampView = (TextView) findViewById(R.id.timestamp);
         Button nextButton = (Button) findViewById(R.id.next_button);
 
         idView.setText(id);
         nameView.setText(name);
         departmentView.setText(department);
+        timestampView.setText(sdf.format(Calendar.getInstance(timezone).getTime()));
 
         Typeface kanitSemiBold = Typeface.createFromAsset(getAssets(), "Kanit-SemiBold.ttf");
         Typeface kanitMedium = Typeface.createFromAsset(getAssets(), "Kanit-Medium.ttf");
@@ -55,6 +64,7 @@ public class SuccessActivity extends AppCompatActivity {
         nameView.setTypeface(kanitSemiBold);
         departmentView.setTypeface(kanitSemiBold);
         nextButton.setTypeface(kanitSemiBold);
+        timestampView.setTypeface(kanitSemiBold);
 
         nextButton.setOnClickListener(new View.OnClickListener() {
             @Override

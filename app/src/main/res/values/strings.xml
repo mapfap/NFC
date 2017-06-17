@@ -6,5 +6,8 @@
     <string name="no_active_event">No active event. Please activate the event on Web Console.</string>
     <string name="no_employee_found">No employee record matched: </string>
     <string name="enter_employee">Please enter the Employee ID.</string>
-    <string name="un_registered_nfc">NFC not yet registered to any employee. Please enter Employee ID.</string>
+    <string name="un_registered_nfc">This Card has not been registered before. Please enter Employee ID.</string>
+    <string name="create_new_employee">Create new Employee</string>
+    <string name="retry">Retry</string>
+    <string name="cancel">Cancel</string>
 </resources>
