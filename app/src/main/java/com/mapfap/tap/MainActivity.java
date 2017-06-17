@@ -3,7 +3,6 @@ package com.mapfap.tap;
 import android.app.AlertDialog;
 import android.app.PendingIntent;
 import android.app.ProgressDialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Typeface;
@@ -12,17 +11,13 @@ import android.os.Bundle;
 import android.provider.Settings;
 import android.support.v7.app.AppCompatActivity;
 import android.text.InputType;
+import android.util.Log;
 import android.view.View;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
-
-import java.text.SimpleDateFormat;
-import java.util.TimeZone;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -40,9 +35,6 @@ public class MainActivity extends AppCompatActivity {
     private static final int ANIMATION_INTERVAL = 30; // ms
     private static final int SUCCESS_PAGE_REQUEST_CODE = 1; // ms
     private Button manualButton;
-    private ProgressDialog progressDialog;
-    private String currentEmployeeID;
-    private String currentNfcId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,7 +47,7 @@ public class MainActivity extends AppCompatActivity {
         ImageButton refreshButton = (ImageButton) findViewById(R.id.refresh_button);
         manualButton = (Button) findViewById(R.id.manual_button);
 
-        progressDialog = new ProgressDialog(MainActivity.this);
+        ProgressDialog progressDialog = new ProgressDialog(MainActivity.this);
         progressDialog.setTitle("Sending...");
         progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
         progressDialog.setCanceledOnTouchOutside(false);
@@ -123,54 +115,46 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 String employeeId = et.getText().toString();
-                currentEmployeeID = employeeId;
-                apiCaller.findEmployeeByEmployeeId(UserState.respondManualTap, currentEmployeeID);
+                apiCaller.findEmployeeByEmployeeId(UserState.respondManualTap, employeeId, "NO_NFC_VALUE_FOR_THIS_SCENARIO");
             }
         });
 
         builder.create().show();
-        InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-        inputMethodManager.toggleSoftInput(InputMethodManager.RESULT_SHOWN, 0);
 
     }
 
     private void respondManualEmployeeFound(APIResponse respond) {
-        StringBuilder sb = new StringBuilder();
-        sb.append(respond.employeeId);
-        sb.append(" ");
-        sb.append(respond.employeeName);
-        sb.append(" ");
-        sb.append(respond.employeeDepartment);
-        sb.append(" ");
+        String sb = "ID: " +
+                respond.employeeId +
+                "\nName: " +
+                respond.employeeName +
+                "\nDepartment: " +
+                respond.employeeDepartment;
 
-        String employeeId = respond.employeeId;
-        currentEmployeeID = employeeId;
+        final String employeeId = respond.employeeId;
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setMessage("Confirm Tap");
-        builder.setMessage("Employee Matched: " + sb.toString());
+        builder.setTitle("Confirm Tap");
+        builder.setMessage("[Employee Matched]\n" + sb);
 
         builder.setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialogInterface, int i) {
-                apiCaller.sendManualTap(UserState.respondManualEmployeeFound, currentEmployeeID, false);
+                apiCaller.sendManualTap(UserState.respondManualEmployeeFound, employeeId, false);
             }
         });
         builder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialogInterface, int i) {
-                InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-                inputMethodManager.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0);
             }
         });
         builder.create().show();
     }
 
-    private void respondManualEmployeeNotFound(String employeeId) {
-        currentEmployeeID = employeeId;
+    private void respondManualEmployeeNotFound(final String employeeId) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setMessage(getResources().getString(R.string.no_employee_found) + currentEmployeeID);
+        builder.setMessage(getResources().getString(R.string.no_employee_found) + " " + employeeId);
         builder.setPositiveButton(R.string.create_new_employee, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialogInterface, int i) {
-                responseCreateNewEmployeeWithoutNfc(currentEmployeeID);
+                responseCreateNewEmployeeWithoutNfc(employeeId);
             }
         });
 
@@ -184,14 +168,11 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void responseCreateNewEmployeeWithoutNfc(String employeeId) {
-        currentEmployeeID = employeeId;
-        apiCaller.sendManualTap(UserState.respondManualEmployeeFound, currentEmployeeID, true);
+        apiCaller.sendManualTap(UserState.respondManualTap, employeeId, true);
     }
 
     private void responseCreateNewEmployeeWithNfc(String nfcId, String employeeId) {
-        currentNfcId = nfcId;
-        currentEmployeeID = employeeId;
-        apiCaller.sendCardTap(UserState.responseNewNfcTap ,currentNfcId, true);
+        apiCaller.sendCardTap(UserState.responseNewNfcTap, nfcId, true, employeeId);
     }
 
     @Override
@@ -213,8 +194,6 @@ public class MainActivity extends AppCompatActivity {
             mAdapter.disableForegroundDispatch(this);
         }
         mFasterAnimationsContainer.stop();
-        InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-        inputMethodManager.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0);
     }
 
     private void showWirelessSettingsDialog() {
@@ -234,9 +213,6 @@ public class MainActivity extends AppCompatActivity {
         if (NfcAdapter.ACTION_TAG_DISCOVERED.equals(action)) {
             byte[] id = intent.getByteArrayExtra(NfcAdapter.EXTRA_ID);
             respondNewNfcTap(toHex(id));
-
-            // TODO: Remove debugging toast.
-            Toast.makeText(getApplicationContext(), toHex(id), Toast.LENGTH_SHORT);
         }
     }
 
@@ -245,8 +221,7 @@ public class MainActivity extends AppCompatActivity {
             respondNoActiveEvent();
             return;
         }
-        currentNfcId = nfcId;
-        apiCaller.sendCardTap(UserState.responseNewNfcTap ,nfcId, false);
+        apiCaller.sendCardTap(UserState.responseNewNfcTap, nfcId, false, "");
     }
 
     private void respondError(APIResponse response) {
@@ -261,8 +236,6 @@ public class MainActivity extends AppCompatActivity {
         builder.setMessage(errorMessage);
         builder.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialogInterface, int i) {
-                InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-                inputMethodManager.toggleSoftInput(InputMethodManager.RESULT_HIDDEN, 0);
             }
         });
         builder.create().show();
@@ -287,6 +260,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void respondUnRegisteredNfc(final String nfcId) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("NFC#" + nfcId);
         builder.setMessage(R.string.un_registered_nfc);
 
         final EditText et = new EditText(this);
@@ -297,27 +271,19 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 String employeeId = et.getText().toString();
-                currentEmployeeID = employeeId;
-                currentNfcId = nfcId;
-                apiCaller.findEmployeeByEmployeeId(UserState.respondUnRegisteredNfc, employeeId);
+                apiCaller.findEmployeeByEmployeeId(UserState.respondUnRegisteredNfc, employeeId, nfcId);
             }
         });
 
         builder.create().show();
-        InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-        inputMethodManager.toggleSoftInput(InputMethodManager.RESULT_SHOWN, 0);
     }
 
-    private void respondEmployeeNotFoundAfterNfc(String employeeId, String nfcId) {
-
-        currentNfcId = nfcId;
-        currentEmployeeID = employeeId;
-
+    private void respondEmployeeNotFoundAfterNfc(final String employeeId, final String nfcId) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setMessage(getResources().getString(R.string.no_employee_found) + employeeId);
+        builder.setMessage(getResources().getString(R.string.no_employee_found) + " " + employeeId);
         builder.setPositiveButton(R.string.create_new_employee, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialogInterface, int i) {
-                responseCreateNewEmployeeWithNfc(currentNfcId, currentNfcId);
+                responseCreateNewEmployeeWithNfc(nfcId, employeeId);
             }
         });
 
@@ -330,37 +296,35 @@ public class MainActivity extends AppCompatActivity {
         builder.create().show();
     }
 
-    private void respondNewNfcEmployeeFound(APIResponse respond, String nfcId) {
-        StringBuilder sb = new StringBuilder();
-        sb.append("ID: ");
-        sb.append(respond.employeeId);
-        sb.append("\nName: ");
-        sb.append(respond.employeeName);
-        sb.append("\nDepartment: ");
-        sb.append(respond.employeeDepartment);
+    private void respondNewNfcEmployeeFound(APIResponse respond, final String nfcId) {
+        String sb = "ID: " +
+                respond.employeeId +
+                "\nName: " +
+                respond.employeeName +
+                "\nDepartment: " +
+                respond.employeeDepartment;
 
-        currentNfcId = nfcId;
-        currentEmployeeID = respond.employeeId;
+        final String employeeId = respond.employeeId;
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setMessage("Confirm Card Registration");
-        builder.setMessage("Employee Matched: " + sb.toString());
+        builder.setMessage("Employee Matched: " + sb);
 
         builder.setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialogInterface, int i) {
-                apiCaller.registerEmployeeCard(UserState.respondNewNfcEmployeeFound, currentNfcId, currentEmployeeID);
+                apiCaller.registerEmployeeCard(UserState.respondNewNfcEmployeeFound, nfcId, employeeId);
             }
         });
         builder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialogInterface, int i) {
-                respondUnRegisteredNfc(currentNfcId);
+                respondUnRegisteredNfc(nfcId);
             }
         });
         builder.create().show();
     }
 
     private void respondNoActiveEvent() {
-        eventName.setText("Event: N/A");
+        eventName.setText(R.string.default_event);
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setMessage(R.string.no_active_event);
@@ -439,7 +403,12 @@ public class MainActivity extends AppCompatActivity {
         activeEventExists = response.activeEventExists;
 
         if (activeEventExists) {
-            eventName.setText(response.activeEvent);
+
+            String shortenedEventName = response.activeEvent;
+            if (shortenedEventName.length() > 14) {
+                shortenedEventName = shortenedEventName.substring(0, 12) + "..";
+            }
+            eventName.setText(shortenedEventName);
         } else {
             respondNoActiveEvent();
         }
@@ -449,7 +418,7 @@ public class MainActivity extends AppCompatActivity {
         if (response.isNfcRegistered) {
             respondTapSuccess(response);
         } else {
-            respondUnRegisteredNfc(currentNfcId);
+            respondUnRegisteredNfc(response.requestingNfcId);
         }
     }
 
@@ -457,7 +426,7 @@ public class MainActivity extends AppCompatActivity {
         if (response.isEmployeeFound) {
             respondManualEmployeeFound(response);
         } else {
-            respondManualEmployeeNotFound(currentEmployeeID);
+            respondManualEmployeeNotFound(response.requestingEmployeeId);
         }
     }
 
@@ -469,9 +438,9 @@ public class MainActivity extends AppCompatActivity {
 
     private void onRespondUnRegisteredNfc(APIResponse response) {
         if (response.isEmployeeFound) {
-            respondNewNfcEmployeeFound(response, currentNfcId);
+            respondNewNfcEmployeeFound(response, response.requestingNfcId);
         } else {
-            respondEmployeeNotFoundAfterNfc(currentEmployeeID, currentNfcId);
+            respondEmployeeNotFoundAfterNfc(response.requestingEmployeeId, response.requestingNfcId);
         }
     }
 

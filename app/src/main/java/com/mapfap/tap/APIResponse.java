@@ -24,10 +24,13 @@ class APIResponse {
 
 //    public String timestamp;
 
+    // Hold Request Params
+    public String requestingNfcId;
+    public String requestingEmployeeId;
+
     public APIResponse() {
 
     }
-
 
     public void copy(APIResponse o) {
         this.isError = o.isError;

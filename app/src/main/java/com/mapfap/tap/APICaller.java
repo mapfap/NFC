@@ -29,26 +29,32 @@ class APICaller {
     protected ProgressDialog dialog;
     protected UserState userState;
 
+    protected String requestingNfcId;
+    protected String requestingEmployeeId;
+
     public APICaller(MainActivity activity, ProgressDialog dialog) {
         this.activity = activity;
         this.dialog = dialog;
     }
 
     // POST /taps
-    public void sendCardTap(UserState userState, String nfcId, boolean autoCreateEmployee) {
+    public void sendCardTap(UserState userState, String nfcId, boolean autoCreateEmployee, String employeeId) {
         this.userState = userState;
-        sendRequest("POST", "/taps/", "nfc=" + nfcId+ "&" + "auto_create_employee=" + autoCreateEmployee);
+        this.requestingNfcId = nfcId;
+        sendRequest("POST", "/taps/", "nfc=" + nfcId + "&auto_create_employee=" + autoCreateEmployee + "&code=" + employeeId);
     }
 
     // POST /taps
     public void sendManualTap(UserState userState, String employeeId, boolean autoCreateEmployee) {
         this.userState = userState;
-        sendRequest("POST", "/taps/", "code=" + employeeId + "&" + "auto_create_employee=" + autoCreateEmployee);
+        sendRequest("POST", "/taps/", "code=" + employeeId + "&auto_create_employee=" + autoCreateEmployee);
     }
 
     // GET /employees/search/ 
-    public void findEmployeeByEmployeeId(UserState userState, String employeeId) {
+    public void findEmployeeByEmployeeId(UserState userState, String employeeId, String nfcId) {
         this.userState = userState;
+        this.requestingEmployeeId = employeeId;
+        this.requestingNfcId = nfcId;
         sendRequest("GET", "/employees/search/" + employeeId, "");
     }
 
@@ -83,7 +89,7 @@ class APICaller {
             this.url = url;
             this.body = body;
             this.response = response;
-            Log.d("APICaller", this.url);
+            Log.d("APICaller", this.url + " --> " + this.body);
         }
 
         @Override
@@ -109,7 +115,7 @@ class APICaller {
                 urlc.setRequestProperty("Accept","application/json");
                 int responseCode = urlc.getResponseCode();
                 dialog.setProgress(40);
-                in = new BufferedReader(new InputStreamReader(urlc.getInputStream()),8096);
+                in = new BufferedReader(new InputStreamReader(urlc.getInputStream()), 8096);
                 StringBuilder fullResponse = new StringBuilder();
                 String response;
                 while ((response = in.readLine()) != null) {
@@ -166,7 +172,7 @@ class APICaller {
                 dataout.writeBytes(this.body);
 
                 int responseCode = urlc.getResponseCode();
-                in = new BufferedReader(new InputStreamReader(urlc.getInputStream()),8096);
+                in = new BufferedReader(new InputStreamReader(urlc.getInputStream()), 8096);
 
                 StringBuilder fullResponse = new StringBuilder();
                 String response;
@@ -206,13 +212,20 @@ class APICaller {
 
         @Override
         protected Void doInBackground(Void... voids) {
-
             if (this.method.equals("GET")) {
                 performGet();
             } else if (this.method.equals("POST")) {
                 performPost();
             } else {
                 Log.e("APICaller", "Unsupported method '" + this.method + "'");
+            }
+
+            if (requestingEmployeeId != null) {
+                this.response.requestingEmployeeId = requestingEmployeeId;
+            }
+
+            if (requestingNfcId != null) {
+                this.response.requestingNfcId = requestingNfcId;
             }
 
             return null;
