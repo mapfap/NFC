@@ -2,6 +2,7 @@ package com.mapfap.tap;
 
 import android.app.ProgressDialog;
 import android.os.AsyncTask;
+import android.os.Handler;
 import android.util.Log;
 
 import com.google.gson.Gson;
@@ -95,8 +96,18 @@ class APICaller {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            dialog.show();
             dialog.setProgress(0);
+
+            final Handler handler = new Handler();
+            handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    if (dialog.getProgress() > 0 && dialog.getProgress() < 100) {
+                        dialog.show();
+                    }
+                }
+            }, 1000);
+
         }
 
         public void performGet() {
@@ -121,11 +132,11 @@ class APICaller {
                 while ((response = in.readLine()) != null) {
                     fullResponse.append(response);
                 }
-                dialog.setProgress(90);
+                dialog.setProgress(70);
                 this.response.copy(new Gson().fromJson(fullResponse.toString(), APIWrapper.class).toAPIResponse());
                 Log.d("APICaller", fullResponse.toString());
                 in.close();
-                dialog.setProgress(100);
+                dialog.setProgress(90);
             } catch (FileNotFoundException e) {
                 response.isError = true;
                 response.errorDetails = "Missing Employee ID";
@@ -156,6 +167,7 @@ class APICaller {
             BufferedReader in = null;
             try {
                 URL url = new URL(this.url);
+                dialog.setProgress(10);
                 urlc = (HttpURLConnection) url.openConnection();
                 urlc.setConnectTimeout(DEFAULT_TIMEOUT);
                 urlc.setReadTimeout(DEFAULT_TIMEOUT);
@@ -172,6 +184,7 @@ class APICaller {
                 dataout.writeBytes(this.body);
 
                 int responseCode = urlc.getResponseCode();
+                dialog.setProgress(40);
                 in = new BufferedReader(new InputStreamReader(urlc.getInputStream()), 8096);
 
                 StringBuilder fullResponse = new StringBuilder();
@@ -180,10 +193,11 @@ class APICaller {
                 while ((response = in.readLine()) != null) {
                     fullResponse.append(response);
                 }
-
+                dialog.setProgress(70);
                 this.response.copy(new Gson().fromJson(fullResponse.toString(), APIWrapper.class).toAPIResponse());
                 Log.d("APICaller", fullResponse.toString());
                 in.close();
+                dialog.setProgress(90);
             } catch (SocketException e) {
                 response.isError = true;
                 response.errorDetails = "Couldn't reach server at " + this.url;
@@ -212,6 +226,9 @@ class APICaller {
 
         @Override
         protected Void doInBackground(Void... voids) {
+
+            dialog.setProgress(5);
+
             if (this.method.equals("GET")) {
                 performGet();
             } else if (this.method.equals("POST")) {
@@ -228,6 +245,7 @@ class APICaller {
                 this.response.requestingNfcId = requestingNfcId;
             }
 
+            dialog.setProgress(100);
             return null;
         }
 

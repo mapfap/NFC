@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.graphics.Typeface;
 import android.nfc.NfcAdapter;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
@@ -40,7 +41,13 @@ public class SuccessActivity extends AppCompatActivity {
         String id = getIntent().getStringExtra("EMPLOYEE_ID");
         String name = getIntent().getStringExtra("EMPLOYEE_NAME");
         String department = getIntent().getStringExtra("EMPLOYEE_DEPARTMENT");
+        Boolean duplicate = getIntent().getBooleanExtra("DUPLICATE", false);
         thisIntent = getIntent();
+
+        if (duplicate) {
+            View rootView = findViewById(R.id.activity_success);
+            Snackbar.make(rootView, "Warning: This is duplicated tap.", Snackbar.LENGTH_LONG).show();
+        }
 
         TextView appName = (TextView) findViewById(R.id.app_name2);
         TextView success = (TextView) findViewById(R.id.success);
