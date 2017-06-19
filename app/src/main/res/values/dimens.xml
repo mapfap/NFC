@@ -1,3 +1,26 @@
 <resources>
-    <dimen name="fab_margin">16dp</dimen>
+    <dimen name="header_icon_size">50dp</dimen>
+    <dimen name="header_app_name_text_size">30dp</dimen>
+    <dimen name="header_refresh_size">30dp</dimen>
+    <dimen name="event_name_text_size">25dp</dimen>
+
+    <dimen name="tap_card_text_size">25dp</dimen>
+    <dimen name="register_text_size">30dp</dimen>
+    <dimen name="header_margin">15dp</dimen>
+
+    <dimen name="animation_size">300dp</dimen>
+
+    <dimen name="register_success_text_size">40dp</dimen>
+    <dimen name="next_text_size">35dp</dimen>
+
+    <dimen name="employee_id_text_size">24dp</dimen>
+    <dimen name="employee_name_text_size">24dp</dimen>
+    <dimen name="employee_department_text_size">24dp</dimen>
+    <dimen name="employee_timestamp_text_size">22dp</dimen>
+    <dimen name="employee_name_margin">34dp</dimen>
+
+    <dimen name="employee_id_placeholder_text_size">40dp</dimen>
+    <dimen name="numrow_height">100dp</dimen>
+    <dimen name="numpad_text_size">35dp</dimen>
+
 </resources>

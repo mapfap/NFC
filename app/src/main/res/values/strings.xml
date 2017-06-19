@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Tap</string>
+    <string name="app_name">Krungsri Q</string>
     <string name="error">Error</string>
     <string name="no_nfc">This device doesn\'t support NFC.</string>
     <string name="nfc_disabled">NFC is not enabled. Please go to the wireless settings to enable it.</string>

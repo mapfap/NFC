@@ -6,45 +6,47 @@
     android:layout_height="match_parent"
     android:background="@color/colorPrimaryDark"
     android:gravity="top|center"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:weightSum="1">
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_margin="10dp"
         android:layout_height="wrap_content"
-        >
+        android:layout_gravity="center|center"
+        android:layout_margin="10dp"
+        android:orientation="horizontal">
 
         <ImageView
             android:id="@+id/bay_logo"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
+            android:layout_width="@dimen/header_icon_size"
+            android:layout_height="@dimen/header_icon_size"
+            app:srcCompat="@drawable/bay_icon"
+            android:layout_alignParentTop="true"
             android:layout_alignParentStart="true"
-            android:layout_alignTop="@+id/refresh_button"
-            android:layout_marginStart="15dp"
-            app:srcCompat="@drawable/bay_icon" />
+            android:layout_marginStart="@dimen/header_margin" />
 
         <TextView
             android:id="@+id/app_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="@string/app_name"
             android:textColor="@color/colorWhite"
-            android:textSize="26dp"
-            android:text="Krungsri Attendant"
-            android:layout_alignBottom="@+id/refresh_button"
+            android:textSize="@dimen/header_app_name_text_size"
+            android:layout_centerVertical="true"
             android:layout_centerHorizontal="true" />
 
         <ImageButton
             android:id="@+id/refresh_button"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_alignParentEnd="true"
-            android:layout_alignParentTop="true"
-            android:layout_marginEnd="12dp"
-            android:layout_marginTop="12dp"
-            android:scaleType="fitCenter"
-            android:adjustViewBounds="true"
+            android:layout_width="@dimen/header_refresh_size"
+            android:layout_height="@dimen/header_refresh_size"
+            android:layout_gravity="center"
             android:background="@android:color/transparent"
-            app:srcCompat="@drawable/refresh" />
+            android:scaleType="fitCenter"
+            app:srcCompat="@drawable/refresh"
+            android:layout_marginEnd="@dimen/header_margin"
+            android:layout_centerVertical="true"
+            android:layout_alignParentEnd="true" />
 
     </RelativeLayout>
 
@@ -53,17 +55,17 @@
         android:id="@+id/event_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="36dp"
+        android:textSize="@dimen/event_name_text_size"
         android:textColor="@color/colorPrimary"
-        android:text="Event: N/A" />
+        android:text="@string/default_event" />
 
 
     <ImageView
         android:layout_margin="10dp"
         android:id="@+id/nfc_emit_view"
-        android:layout_width="300dp"
-        android:layout_height="300dp"
-         />
+        android:layout_width="@dimen/animation_size"
+        android:layout_height="@dimen/animation_size"
+        android:layout_weight="0.24" />
 
     <TextView
         android:id="@+id/please_tap"
@@ -71,7 +73,7 @@
         android:layout_height="wrap_content"
         android:layout_centerVertical="true"
         android:text="Tap Card to Scan"
-        android:textSize="26dp"
+        android:textSize="@dimen/tap_card_text_size"
         android:textColor="@color/colorWhite" />
 
     <android.support.percent.PercentRelativeLayout
@@ -82,7 +84,7 @@
     <Button
         android:id="@+id/manual_button"
         app:layout_widthPercent="70%"
-        android:textSize="36sp"
+        android:textSize="@dimen/register_text_size"
         android:layout_gravity="center"
         android:layout_height="wrap_content"
         android:text="ลงทะเบียน"

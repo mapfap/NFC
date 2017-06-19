@@ -39,6 +39,8 @@ public class MainActivity extends AppCompatActivity {
     private static final int LINK_NFC_NUMPAD_REQUEST_CODE = 3;
     private Button manualButton;
 
+    private static final int MAX_EVENT_NAME_LENGTH = 18;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -413,8 +415,8 @@ public class MainActivity extends AppCompatActivity {
         if (activeEventExists) {
 
             String shortenedEventName = response.activeEvent;
-            if (shortenedEventName.length() > 14) {
-                shortenedEventName = shortenedEventName.substring(0, 12) + "..";
+            if (shortenedEventName.length() > MAX_EVENT_NAME_LENGTH) {
+                shortenedEventName = shortenedEventName.substring(0, MAX_EVENT_NAME_LENGTH - 2) + "..";
             }
             eventName.setText(shortenedEventName);
         } else {
