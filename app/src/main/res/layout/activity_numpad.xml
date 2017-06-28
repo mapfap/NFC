@@ -27,18 +27,18 @@
         app:layout_heightPercent="10%">
 
         <Button
-            android:id="@+id/num7"
+            android:id="@+id/num1"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:background="@drawable/num_button"
-            android:text="7"
+            android:text="1"
             android:textColor="@color/colorPrimary"
             android:textSize="@dimen/numpad_text_size"
             app:layout_heightPercent="100%"
             app:layout_widthPercent="30%" />
 
         <Button
-            android:id="@+id/num8"
+            android:id="@+id/num2"
             android:layout_width="match_parent"
             android:layout_height="22dp"
             android:layout_alignParentTop="true"
@@ -46,20 +46,20 @@
             android:layout_gravity="center"
             android:layout_weight="0.18"
             android:background="@drawable/num_button"
-            android:text="8"
+            android:text="2"
             android:textColor="@color/colorPrimary"
             android:textSize="@dimen/numpad_text_size"
             app:layout_heightPercent="100%"
             app:layout_widthPercent="30%" />
 
         <Button
-            android:id="@+id/num9"
+            android:id="@+id/num3"
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
             android:layout_alignParentTop="true"
             android:layout_gravity="center"
             android:background="@drawable/num_button"
-            android:text="9"
+            android:text="3"
             android:textColor="@color/colorPrimary"
             android:textSize="@dimen/numpad_text_size"
             app:layout_heightPercent="100%"
@@ -119,18 +119,18 @@
         app:layout_heightPercent="10%">
 
         <Button
-            android:id="@+id/num1"
+            android:id="@+id/num7"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:background="@drawable/num_button"
-            android:text="1"
+            android:text="7"
             android:textColor="@color/colorPrimary"
             android:textSize="@dimen/numpad_text_size"
             app:layout_heightPercent="100%"
             app:layout_widthPercent="30%" />
 
         <Button
-            android:id="@+id/num2"
+            android:id="@+id/num8"
             android:layout_width="match_parent"
             android:layout_height="22dp"
             android:layout_alignParentTop="true"
@@ -138,20 +138,20 @@
             android:layout_gravity="center"
             android:layout_weight="0.18"
             android:background="@drawable/num_button"
-            android:text="2"
+            android:text="8"
             android:textColor="@color/colorPrimary"
             android:textSize="@dimen/numpad_text_size"
             app:layout_heightPercent="100%"
             app:layout_widthPercent="30%" />
 
         <Button
-            android:id="@+id/num3"
+            android:id="@+id/num9"
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
             android:layout_alignParentTop="true"
             android:layout_gravity="center"
             android:background="@drawable/num_button"
-            android:text="3"
+            android:text="9"
             android:textColor="@color/colorPrimary"
             android:textSize="@dimen/numpad_text_size"
             app:layout_heightPercent="100%"

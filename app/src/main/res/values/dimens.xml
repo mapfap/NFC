@@ -23,4 +23,7 @@
     <dimen name="numrow_height">100dp</dimen>
     <dimen name="numpad_text_size">35dp</dimen>
 
+    <dimen name="event_check_mode">16dp</dimen>
+
+
 </resources>

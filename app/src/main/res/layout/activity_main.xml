@@ -51,13 +51,22 @@
     </RelativeLayout>
 
     <TextView
-        android:layout_margin="10dp"
+        android:layout_margin="0dp"
         android:id="@+id/event_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textSize="@dimen/event_name_text_size"
         android:textColor="@color/colorPrimary"
         android:text="@string/default_event" />
+
+    <TextView
+        android:layout_margin="0dp"
+        android:id="@+id/event_check_mode"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="@dimen/event_check_mode"
+        android:textColor="@color/colorPrimary"
+        />
 
 
     <ImageView

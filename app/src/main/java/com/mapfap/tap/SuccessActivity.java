@@ -7,6 +7,7 @@ import android.nfc.NfcAdapter;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -42,6 +43,7 @@ public class SuccessActivity extends AppCompatActivity {
         String name = getIntent().getStringExtra("EMPLOYEE_NAME");
         String department = getIntent().getStringExtra("EMPLOYEE_DEPARTMENT");
         Boolean duplicate = getIntent().getBooleanExtra("DUPLICATE", false);
+        String eventCheckMode = getIntent().getStringExtra("EVENT_STATUS");
         thisIntent = getIntent();
 
         if (duplicate) {
@@ -55,11 +57,13 @@ public class SuccessActivity extends AppCompatActivity {
         TextView nameView = (TextView) findViewById(R.id.employee_name);
         TextView departmentView = (TextView) findViewById(R.id.employee_department);
         TextView timestampView = (TextView) findViewById(R.id.timestamp);
+        TextView eventMode = (TextView) findViewById(R.id.event_mode);
         Button nextButton = (Button) findViewById(R.id.next_button);
 
         idView.setText(id);
         nameView.setText(name);
         departmentView.setText(department);
+        eventMode.setText(eventCheckMode);
         timestampView.setText(sdf.format(Calendar.getInstance(timezone).getTime()));
 
         Typeface kanitSemiBold = Typeface.createFromAsset(getAssets(), "Kanit-SemiBold.ttf");
@@ -67,6 +71,7 @@ public class SuccessActivity extends AppCompatActivity {
 
         appName.setTypeface(kanitMedium);
         success.setTypeface(kanitSemiBold);
+        eventMode.setTypeface(kanitSemiBold);
         idView.setTypeface(kanitSemiBold);
         nameView.setTypeface(kanitSemiBold);
         departmentView.setTypeface(kanitSemiBold);

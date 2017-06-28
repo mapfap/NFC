@@ -20,6 +20,8 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import org.w3c.dom.Text;
+
 public class MainActivity extends AppCompatActivity {
 
     private NfcAdapter mAdapter;
@@ -40,6 +42,7 @@ public class MainActivity extends AppCompatActivity {
     private Button manualButton;
 
     private static final int MAX_EVENT_NAME_LENGTH = 18;
+    private TextView eventCheckMode;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,6 +52,7 @@ public class MainActivity extends AppCompatActivity {
         mPendingIntent = PendingIntent.getActivity(this, 0, new Intent(this, getClass()).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP), 0);
 
         eventName = (TextView) findViewById(R.id.event_name);
+        eventCheckMode = (TextView) findViewById(R.id.event_check_mode);
         ImageButton refreshButton = (ImageButton) findViewById(R.id.refresh_button);
         manualButton = (Button) findViewById(R.id.manual_button);
 
@@ -107,6 +111,7 @@ public class MainActivity extends AppCompatActivity {
 
         appName.setTypeface(kanitMedium);
         eventName.setTypeface(kanitSemiBold);
+        eventCheckMode.setTypeface(kanitSemiBold);
         pleaseTap.setTypeface(kanitLight);
         manualButton.setTypeface(kanitSemiBold);
     }
@@ -168,7 +173,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void responseCreateNewEmployeeWithoutNfc(String employeeId) {
-        apiCaller.sendManualTap(UserState.respondManualTap, employeeId, true);
+        apiCaller.sendManualTap(UserState.respondManualTapForceCreate, employeeId, true);
     }
 
     private void responseCreateNewEmployeeWithNfc(String nfcId, String employeeId) {
@@ -251,6 +256,7 @@ public class MainActivity extends AppCompatActivity {
         intent.putExtra("EMPLOYEE_NAME", response.employeeName);
         intent.putExtra("EMPLOYEE_DEPARTMENT", response.employeeDepartment);
         intent.putExtra("DUPLICATE", response.isDuplicateTap);
+        intent.putExtra("EVENT_STATUS", response.activeEventCheckMode);
         startActivityForResult(intent, SUCCESS_PAGE_REQUEST_CODE);
     }
 
@@ -263,7 +269,7 @@ public class MainActivity extends AppCompatActivity {
         } else if (requestCode == MANUAL_TAP_NUMPAD_REQUEST_CODE) {
             if (resultCode == RESULT_OK) {
                 String employeeId = data.getStringExtra("NUMBER");
-                apiCaller.findEmployeeByEmployeeId(UserState.respondManualTap, employeeId, "NO_NFC_VALUE_FOR_THIS_SCENARIO");
+                apiCaller.findEmployeeByEmployeeId(UserState.respondManualTapFirstEntry, employeeId, "NO_NFC_VALUE_FOR_THIS_SCENARIO");
             }
         } else if (requestCode == LINK_NFC_NUMPAD_REQUEST_CODE) {
             if (resultCode == RESULT_OK) {
@@ -396,8 +402,11 @@ public class MainActivity extends AppCompatActivity {
                 case respondNewNfcEmployeeFound:
                     onRespondNewNfcEmplyoeeFound(response);
                     break;
-                case respondManualTap:
-                    onRespondManualTap(response);
+                case respondManualTapFirstEntry:
+                    onRespondManualTapFirstEntry(response);
+                    break;
+                case respondManualTapForceCreate:
+                    onRespondManualTapForceCreate(response);
                     break;
             }
         }
@@ -419,6 +428,8 @@ public class MainActivity extends AppCompatActivity {
                 shortenedEventName = shortenedEventName.substring(0, MAX_EVENT_NAME_LENGTH - 2) + "..";
             }
             eventName.setText(shortenedEventName);
+
+            eventCheckMode.setText(response.activeEventCheckMode);
         } else {
             respondNoActiveEvent();
         }
@@ -432,11 +443,19 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void onRespondManualTap(APIResponse response) {
+    // Click "Register" -> Result from Numpad Page -> Search for employee
+    private void onRespondManualTapFirstEntry(APIResponse response) {
         if (response.isEmployeeFound) {
             respondManualEmployeeFound(response);
         } else {
             respondManualEmployeeNotFound(response.requestingEmployeeId);
+        }
+    }
+
+    // Click "Register" -> Result from Numpad Page -> Search for employee *NOT FOUND* -> Click "Create Employee"
+    private void onRespondManualTapForceCreate(APIResponse response) {
+        if (response.isEmployeeFound) {
+            respondTapSuccess(response);
         }
     }
 

@@ -24,6 +24,8 @@ public class APIWrapper {
     public boolean duplicate;
 //    public String timestamp;
 
+    public String active_event_check_mode;
+
     public  APIWrapper() {
 
     }
@@ -41,6 +43,7 @@ public class APIWrapper {
         response.isEmployeeFound = employee_found;
         response.activeEvent = event_name;
         response.isDuplicateTap = duplicate;
+        response.activeEventCheckMode = active_event_check_mode;
         return response;
     }
 }

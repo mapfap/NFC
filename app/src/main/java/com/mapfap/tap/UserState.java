@@ -5,6 +5,6 @@ package com.mapfap.tap;
  */
 
 public enum UserState {
-    respondManualEmployeeFound, responseNewNfcTap, respondUnRegisteredNfc, getActiveEvent, respondNewNfcEmployeeFound, respondManualTap
+    respondManualEmployeeFound, responseNewNfcTap, respondUnRegisteredNfc, getActiveEvent, respondNewNfcEmployeeFound, respondManualTapForceCreate, respondManualTapFirstEntry
 
 }

@@ -18,6 +18,7 @@ class APIResponse {
     public boolean isDuplicateTap;
 
     public String activeEvent;
+    public String activeEventCheckMode;
     public boolean activeEventExists;
 
     public boolean isEmployeeFound;
@@ -44,5 +45,6 @@ class APIResponse {
         this.activeEventExists = o.activeEventExists;
         this.isEmployeeFound = o.isEmployeeFound;
         this.isDuplicateTap = o.isDuplicateTap;
+        this.activeEventCheckMode = o.activeEventCheckMode;
     }
 }

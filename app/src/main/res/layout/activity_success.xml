@@ -59,6 +59,15 @@
         android:textColor="@color/colorPrimary" />
 
     <TextView
+        android:id="@+id/event_mode"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:text=""
+        android:textSize="@dimen/event_check_mode"
+        android:textColor="@color/colorPrimary" />
+
+    <TextView
         android:id="@+id/employee_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
